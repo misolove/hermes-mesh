@@ -1,70 +1,91 @@
+<div align="center">
+
 # hermes-mesh
 
-[한국어 README](README.ko.md)
+**A private agent mesh for Hermes-to-machine and Hermes-to-Hermes operations**  
+**Hermes들이 안전하게 머신을 조작하고, 기억/스킬을 공유하는 개인 AI 운영망**
 
-Hermes Mesh is a personal agent control-plane concept for letting Hermes instances and machine-local tool nodes cooperate safely across a private network such as Tailscale.
+<br />
 
-The immediate target is Lerippi's environment:
+<a href="README.ko.md"><b>한국어로 보기</b></a>
+&nbsp;&nbsp;·&nbsp;&nbsp;
+<a href="README.en.md"><b>Read in English</b></a>
 
-- Controller: MacBook M3 Max running Hermes Agent
-- Remote node: Ubuntu `mail` server running website and mail services
-- Transport: Tailscale private network
-- Tool protocol: MCP over HTTP
-- Operating model: policy-bound tools, audit logs, backups, and explicit approval for dangerous actions
+<br /><br />
 
-## What this project is
+<a href="docs/architecture.md">Architecture</a>
+&nbsp;·&nbsp;
+<a href="docs/threat-model.md">Threat Model</a>
+&nbsp;·&nbsp;
+<a href="docs/mvp.md">MVP Roadmap</a>
+&nbsp;·&nbsp;
+<a href="docs/shared-memory-and-skills.md">Memory & Skill Exchange</a>
 
-`hermes-mesh` aims to make remote machines first-class, safe tools for Hermes.
+</div>
 
-Instead of giving an agent unrestricted SSH/root access, each machine runs a small policy-enforced node service that exposes a limited MCP tool surface:
+---
 
-- system diagnostics
-- safe command execution through allowlists
-- file reads/writes with path policy and backups
-- git/deploy workflows
-- web service checks/reloads
-- mail server diagnostics
-- optional remote Hermes delegation
+## Quick language select
 
-## Target architecture
+| Language | Start here | Summary |
+| --- | --- | --- |
+| 한국어 | [README.ko.md](README.ko.md) | MacBook Hermes가 Ubuntu 홈페이지/메일서버를 Tailscale+MCP로 안전하게 다루고, Hermes들끼리 출처가 명시된 기억과 승인 기반 스킬을 공유하는 구조 |
+| English | [README.en.md](README.en.md) | A Tailscale + MCP + policy + audit control plane for safe remote machine control, Hermes-to-Hermes delegation, attributed shared memory, and user-confirmed skill sharing |
+
+## What is this?
+
+`hermes-mesh` is a design-and-implementation project for a personal AI operations mesh.
+
+The first target is Lerippi's setup:
 
 ```text
-MacBook Hermes Controller
-  |
-  | MCP over HTTP + Bearer token
-  | Tailscale private DNS/IP only
-  v
-Ubuntu hermes-node-mcp
-  - policy engine
-  - tool handlers
-  - audit log
-  - optional sudo wrapper scripts
-  - optional local Hermes worker
+MacBook M3 Max / Hermes Controller
+  -> Tailscale private network
+  -> Ubuntu `mail` node for homepage + mailserver operations
+  -> policy-bound MCP tools, audit logs, backups, and approval gates
 ```
 
-## Repository status
+The larger goal:
 
-This repo currently contains the initial architecture, threat model, MVP plan, MCP tool spec, configs, and skill drafts. Implementation will follow the staged plan in `docs/mvp.md`.
+```text
+Discord / Telegram / CLI = coordination plane
+Hermes Mesh MCP nodes    = execution plane
+Shared memory cards      = source-attributed memory plane
+Skill packages           = user-confirmed skill sharing plane
+Boradori / Obsidian      = durable knowledge plane
+GitHub                   = source-of-truth plane
+```
+
+## Current repository status
+
+This repository currently contains:
+
+- architecture blueprint
+- threat model
+- MVP roadmap
+- MCP tool specification
+- shared memory and skill exchange design
+- example node and Hermes configs
+- draft Hermes skills
+- Python package skeleton for the future MCP node
+
+Implementation is intentionally staged. The first concrete engineering target is:
+
+```text
+MacBook Hermes can call system_info() on the Ubuntu `mail` node over Tailscale MCP.
+```
 
 ## Reading order
 
-1. `docs/architecture.md`
-2. `docs/threat-model.md`
-3. `docs/mvp.md`
-4. `docs/mcp-tools.md`
-5. `docs/shared-memory-and-skills.md`
-6. `configs/node.example.yaml`
-7. `skills/hermes-mesh-control/SKILL.md`
-8. `skills/ubuntu-mail-homepage-admin/SKILL.md`
-9. `skills/remote-hermes-delegation/SKILL.md`
-
-## Non-goals
-
-- Do not expose remote control over the public internet.
-- Do not run the node service as root.
-- Do not provide unrestricted shell/root access as an MCP tool.
-- Do not store real tokens, private keys, or production secrets in this repo.
+1. [한국어 README](README.ko.md) or [English README](README.en.md)
+2. [Architecture](docs/architecture.md)
+3. [Threat Model](docs/threat-model.md)
+4. [MVP Roadmap](docs/mvp.md)
+5. [MCP Tool Specification](docs/mcp-tools.md)
+6. [Shared Memory and Skill Exchange](docs/shared-memory-and-skills.md)
+7. [Example Ubuntu Node Config](configs/node.example.yaml)
+8. [Draft Skills](skills/)
 
 ## License
 
-MIT, unless changed later.
+MIT

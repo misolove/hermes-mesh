@@ -1,5 +1,7 @@
 # hermes-mesh
 
+[English](README.en.md) · [언어 선택 화면](README.md)
+
 > Tailscale + MCP + 정책 엔진 + 감사 로그를 이용해, 한 Hermes가 다른 머신 또는 다른 Hermes를 안전하게 다룰 수 있게 만드는 개인 AI 운영망 프로젝트.
 
 `hermes-mesh`는 “내 맥북의 Hermes가 내 우분투 홈페이지/메일서버를 자유롭게 핸들링하고, 나중에는 Hermes끼리도 작업을 위임하게 만들 수 없을까?”라는 아이디어에서 시작한 프로젝트입니다.
@@ -38,8 +40,12 @@ Ubuntu Hermes = optional local worker
 Tailscale = private transport
 MCP = tool protocol
 Skill = operating manual / policy / workflow
+Memory card = source-attributed shared memory
+Skill package = user-confirmed shared skill update
 Audit log = accountability
 Git = homepage change history
+Discord/Telegram = coordination surface
+Boradori/Obsidian = durable knowledge layer
 ```
 
 ## 전체 구조
@@ -57,6 +63,7 @@ flowchart TD
     POL --> GIT[Git/Deploy Tools]
     POL --> WEB[Nginx/Web Tools]
     POL --> MAIL[Postfix/Dovecot Tools]
+    POL --> MEM[Memory/Skill Exchange]
     POL --> RH[Remote Hermes Tools]
     RH --> H2[Ubuntu Hermes Worker, optional]
 ```
@@ -204,6 +211,66 @@ remote Hermes는 read-only 분석 우선
 최종 적용은 policy-bound MCP tool을 통해 수행
 ```
 
+### 7. Hermes 간 기억/스킬 공유
+
+궁극적 목표는 여러 Hermes가 각자 배운 것을 안전하게 공유하는 것입니다.
+
+핵심 원칙:
+
+```text
+Automatic propose, explicit provenance, user-approved promotion.
+```
+
+즉:
+
+```text
+자동으로 제안하고,
+반드시 출처를 남기고,
+공유/승격은 정책 또는 사용자 승인으로 한다.
+```
+
+기억은 raw memory dump가 아니라 출처가 달린 `memory_card`로 공유합니다.
+
+```yaml
+kind: memory_card
+subject: ubuntu-mail-node
+title: Ubuntu mail node is reachable over Tailscale
+source:
+  node_id: macbook-controller
+  agent: hermes
+  method: tailscale_status
+  observed_at: "2026-05-10T15:30:00+09:00"
+confidence: high
+sensitivity: low
+promotion:
+  state: proposed
+```
+
+스킬은 diff와 이유가 있는 `skill_package`로 제안하고, 설치/동기화는 레리삐 확인 후 진행합니다.
+
+```yaml
+kind: skill_package
+name: ubuntu-mail-homepage-admin
+version: 0.1.1
+action: update
+requires_user_confirmation: true
+status: proposed
+```
+
+### 8. Discord multi-agent council과의 관계
+
+Discord/Telegram은 여러 에이전트가 토론하고 역할을 나누는 coordination plane으로 둡니다.
+
+```text
+Discord council proposes
+Reviewer reviews
+Hermes controller applies
+MCP node enforces policy
+Audit log records action
+```
+
+즉, Discord는 회의실이고 `hermes-mesh`는 실제 실행/기억/스킬 공유 계층입니다.
+
 ## 보안 원칙
 
 절대 하지 않을 것:
@@ -287,17 +354,27 @@ run_command() with tiny allowlist
 - long-running job start/status/result/cancel
 - controller-side verification
 
+### MVP 6. Shared Memory and Skill Registry
+
+- `memory_card` schema
+- `skill_package` schema
+- proposal/approval/rejection workflow
+- approved memory sync
+- user-confirmed skill install/sync
+
 ## 레포 구조
 
 ```text
 hermes-mesh/
-  README.md
-  README.ko.md
+  README.md                 # 언어 선택 첫 화면
+  README.ko.md              # 한국어 개요
+  README.en.md              # 영어 개요
   docs/
     architecture.md
     threat-model.md
     mvp.md
     mcp-tools.md
+    shared-memory-and-skills.md
   configs/
     node.example.yaml
     hermes-config.example.yaml
