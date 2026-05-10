@@ -1,5 +1,7 @@
 # hermes-mesh
 
+[한국어 README](README.ko.md)
+
 Hermes Mesh is a personal agent control-plane concept for letting Hermes instances and machine-local tool nodes cooperate safely across a private network such as Tailscale.
 
 The immediate target is Lerippi's environment:
