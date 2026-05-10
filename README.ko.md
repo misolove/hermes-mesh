@@ -427,7 +427,24 @@ HERMES_NODE_TOKEN_MAIL="긴랜덤토큰"
 
 ## 현재 상태
 
-아직 실제 MCP node 구현은 시작 전입니다. 이 repo는 현재 “설계 문서 + 구현 골격 + skill 초안” 상태입니다.
+현재 첫 구현 slice가 들어갔습니다.
+
+```text
+구현됨:
+- source/provenance 필수 `MemoryCard` schema
+- stable `mem_<sha256>` ID
+- local file-backed memory registry
+- propose/list/approve/reject CLI
+- decisions.jsonl 감사 로그
+```
+
+사용 예:
+
+```bash
+uv run --extra dev hermes-mesh memory propose --file card.json
+uv run --extra dev hermes-mesh memory list --state proposed
+uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
+```
 
 다음 구현 목표는 다음 한 줄입니다.
 

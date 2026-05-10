@@ -417,7 +417,26 @@ HERMES_NODE_TOKEN_MAIL="long-random-token"
 
 ## Current status
 
-The repository is currently a design pack plus implementation skeleton. The next implementation target is:
+The first implementation slice is now available:
+
+```text
+Implemented:
+- source/provenance-required `MemoryCard` schema
+- stable `mem_<sha256>` IDs
+- local file-backed memory registry
+- propose/list/approve/reject CLI
+- `decisions.jsonl` audit trail
+```
+
+Usage:
+
+```bash
+uv run --extra dev hermes-mesh memory propose --file card.json
+uv run --extra dev hermes-mesh memory list --state proposed
+uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
+```
+
+The next implementation target is:
 
 ```text
 MacBook Hermes can call system_info() on the Ubuntu mail node over Tailscale MCP.

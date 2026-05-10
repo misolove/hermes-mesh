@@ -69,7 +69,15 @@ This repository currently contains:
 - draft Hermes skills
 - Python package skeleton for the future MCP node
 
-Implementation is intentionally staged. The first concrete engineering target is:
+Implementation is intentionally staged. The first implemented slice is local shared-memory proposals:
+
+```bash
+uv run --extra dev hermes-mesh memory propose --file card.json
+uv run --extra dev hermes-mesh memory list --state proposed
+uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
+```
+
+The next concrete engineering target is:
 
 ```text
 MacBook Hermes can call system_info() on the Ubuntu `mail` node over Tailscale MCP.

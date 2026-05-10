@@ -316,9 +316,59 @@ Initial MVP can use a local file-backed registry in the Git repo or private conf
 Possible paths:
 
 ```text
-~/.hermes-mesh/registry/memory-cards/*.yaml
+~/.hermes-mesh/registry/memory-cards/*.json
 ~/.hermes-mesh/registry/skill-packages/*.yaml
 ~/.hermes-mesh/registry/decisions.jsonl
+```
+
+Current implementation status:
+
+```text
+Implemented now:
+- `src/hermes_mesh/memory.py`
+  - `MemoryCard`
+  - `MemorySource`
+  - `Evidence`
+  - `Promotion`
+  - stable `mem_<sha256>` IDs
+  - source/provenance required by schema
+- `src/hermes_mesh/registry.py`
+  - local file-backed memory-card registry
+  - deduplicating `propose`
+  - `list`, `approve`, `reject`
+  - decision log at `decisions.jsonl`
+- `src/hermes_mesh/cli.py`
+  - `hermes-mesh memory propose --file card.json`
+  - `hermes-mesh memory list [--state proposed]`
+  - `hermes-mesh memory approve <memory_id> --actor lerippi`
+  - `hermes-mesh memory reject <memory_id> --actor lerippi --reason ...`
+```
+
+Example:
+
+```bash
+cat > /tmp/card.json <<'JSON'
+{
+  "subject": "ubuntu-mail-node",
+  "title": "Ubuntu mail node is reachable over Tailscale",
+  "content": "The Ubuntu server is reachable as mail.tailb30d36.ts.net.",
+  "source": {
+    "node_id": "macbook-controller",
+    "agent": "hermes",
+    "method": "tailscale_status",
+    "observed_at": "2026-05-10T15:30:00+09:00",
+    "evidence": [
+      {"type": "command", "command": "tailscale status --json", "redacted": true}
+    ]
+  },
+  "confidence": "high",
+  "sensitivity": "low"
+}
+JSON
+
+uv run --extra dev hermes-mesh memory propose --file /tmp/card.json
+uv run --extra dev hermes-mesh memory list --state proposed
+uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
 ```
 
 Later options:
