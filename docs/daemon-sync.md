@@ -101,6 +101,7 @@ GET  /memory/cards?state=proposed
 GET  /memory/cards/{id}
 POST /memory/cards/{id}/approve
 POST /memory/cards/{id}/reject
+GET  /memory/sync/pull
 POST /memory/sync/push
 ```
 
@@ -122,6 +123,28 @@ This means a daemon rejects anonymous memories. The minimum required provenance 
 ```
 
 Imported cards keep their original `source`. They must not be rewritten as if the receiving node directly observed the fact.
+
+## Start with config
+
+MacBook example:
+
+```bash
+mkdir -p ~/.hermes-mesh
+cp configs/macbook.example.yaml ~/.hermes-mesh/macbook.yaml
+export HERMES_MESH_TOKEN=local-controller-token
+export HERMES_MESH_TOKEN_UBUNTU_MAIL=peer-token
+uv run hermes-mesh-daemon --config ~/.hermes-mesh/macbook.yaml
+```
+
+Ubuntu example:
+
+```bash
+sudo mkdir -p /etc/hermes-mesh /var/lib/hermes-mesh
+sudo cp configs/node.example.yaml /etc/hermes-mesh/node.yaml
+sudo install -m 600 /dev/null /etc/hermes-mesh/hermes-daemon.env
+# add HERMES_MESH_TOKEN and HERMES_MESH_TOKEN_MACBOOK to hermes-daemon.env
+uv run hermes-mesh-daemon --config /etc/hermes-mesh/node.yaml
+```
 
 ## Start locally
 
@@ -174,10 +197,11 @@ only approved_shared cards fan out
 
 ## Next implementation steps
 
-1. Add config-backed peer definitions.
-2. Add periodic heartbeat loop.
-3. Add periodic push/pull loop.
-4. Add MCP facade tools that call local daemon API.
-5. Add launchd/systemd installation helpers.
-6. Add conflict handling and imported-from metadata.
-7. Add user notification when new proposals arrive.
+1. Add config-backed peer definitions. ✅
+2. Add periodic heartbeat loop. ✅
+3. Add periodic push/pull loop. ✅
+4. Add MCP facade tools that call local daemon API. ✅
+5. Add launchd/systemd installation helpers. ✅
+6. Run real MacBook ↔ Ubuntu deployment smoke.
+7. Add conflict handling and imported-from metadata.
+8. Add user notification when new proposals arrive.

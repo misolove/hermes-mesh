@@ -68,6 +68,9 @@ This repository currently contains:
 - MCP tool specification
 - shared memory and skill exchange design
 - daemon-to-daemon memory sync API
+- heartbeat + approved_shared push/pull loop
+- config-backed peer definitions
+- MCP facade wrapping the local daemon
 - example node and Hermes configs
 - draft Hermes skills
 - Python package skeleton for the future MCP node
@@ -78,7 +81,7 @@ Implementation is intentionally staged. The first implemented slices are local s
 uv run --extra dev hermes-mesh memory propose --file card.json
 uv run --extra dev hermes-mesh memory list --state proposed
 uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
-uv run hermes-mesh-daemon --host 127.0.0.1 --port 8732 --node-id macbook-controller --token dev-token
+uv run hermes-mesh-daemon --config configs/macbook.example.yaml
 ```
 
 The next concrete engineering target is:

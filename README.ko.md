@@ -437,6 +437,9 @@ HERMES_NODE_TOKEN_MAIL="긴랜덤토큰"
 - local file-backed memory registry
 - propose/list/approve/reject CLI
 - daemon HTTP API for node-to-node sync
+- heartbeat + approved_shared push/pull loop
+- config-backed peer definitions
+- MCP facade wrapping the local daemon
 - `/memory/sync/push` approved_shared fan-out endpoint
 - decisions.jsonl 감사 로그
 ```
@@ -447,7 +450,7 @@ HERMES_NODE_TOKEN_MAIL="긴랜덤토큰"
 uv run --extra dev hermes-mesh memory propose --file card.json
 uv run --extra dev hermes-mesh memory list --state proposed
 uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
-uv run hermes-mesh-daemon --host 127.0.0.1 --port 8732 --node-id macbook-controller --token dev-token
+uv run hermes-mesh-daemon --config configs/macbook.example.yaml
 ```
 
 다음 구현 목표는 다음 한 줄입니다.

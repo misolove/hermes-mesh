@@ -8,16 +8,8 @@
   <key>ProgramArguments</key>
   <array>
     <string>/Users/letitbe/Developer/hermes-mesh/.venv/bin/hermes-mesh-daemon</string>
-    <string>--host</string>
-    <string>127.0.0.1</string>
-    <string>--port</string>
-    <string>8732</string>
-    <string>--node-id</string>
-    <string>macbook-controller</string>
-    <string>--role</string>
-    <string>controller</string>
-    <string>--registry</string>
-    <string>/Users/letitbe/.hermes-mesh/registry</string>
+    <string>--config</string>
+    <string>/Users/letitbe/.hermes-mesh/macbook.yaml</string>
   </array>
 
   <key>EnvironmentVariables</key>

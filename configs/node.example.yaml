@@ -1,13 +1,26 @@
 node:
   id: ubuntu-mail
   name: mail
-  os: linux
-  bind: "100.89.252.12"
+  role: worker
+
+server:
+  host: "100.89.252.12"
   port: 8732
-  transport: http
-  auth:
-    type: bearer
-    token_env: HERMES_NODE_TOKEN
+  token_env: HERMES_MESH_TOKEN
+
+registry:
+  path: /var/lib/hermes-mesh/registry
+
+sync:
+  enabled: true
+  heartbeat_interval_seconds: 30
+  sync_interval_seconds: 60
+
+peers:
+  - id: macbook-controller
+    url: http://100.94.79.92:8732
+    token_env: HERMES_MESH_TOKEN_MACBOOK
+    role: controller
 
 roles:
   - webserver

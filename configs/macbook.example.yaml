@@ -1,0 +1,23 @@
+node:
+  id: macbook-controller
+  name: LetitGo
+  role: controller
+
+server:
+  host: "127.0.0.1"
+  port: 8732
+  token_env: HERMES_MESH_TOKEN
+
+registry:
+  path: /Users/letitbe/.hermes-mesh/registry
+
+sync:
+  enabled: true
+  heartbeat_interval_seconds: 30
+  sync_interval_seconds: 60
+
+peers:
+  - id: ubuntu-mail
+    url: http://100.89.252.12:8732
+    token_env: HERMES_MESH_TOKEN_UBUNTU_MAIL
+    role: worker

@@ -342,6 +342,19 @@ Implemented now:
   - `hermes-mesh memory list [--state proposed]`
   - `hermes-mesh memory approve <memory_id> --actor lerippi`
   - `hermes-mesh memory reject <memory_id> --actor lerippi --reason ...`
+- `src/hermes_mesh/daemon.py`
+  - daemon HTTP API
+  - `/peers/heartbeat`
+  - `/memory/sync/push`
+  - `/memory/sync/pull`
+- `src/hermes_mesh/sync.py`
+  - heartbeat
+  - approved_shared push/pull sync
+  - one-shot sync helper for periodic loops
+- `src/hermes_mesh/mcp_facade.py` and `src/hermes_mesh/server.py`
+  - MCP-facing wrapper around the local daemon
+- `configs/*.example.yaml`
+  - MacBook and Ubuntu peer definitions
 ```
 
 Example:
