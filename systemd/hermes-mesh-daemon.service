@@ -1,0 +1,22 @@
+[Unit]
+Description=Hermes Mesh Daemon
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/hermes-mesh
+EnvironmentFile=/etc/hermes-mesh/hermes-daemon.env
+ExecStart=/opt/hermes-mesh/.venv/bin/hermes-mesh-daemon --host ${HERMES_MESH_HOST} --port ${HERMES_MESH_PORT} --node-id ${HERMES_MESH_NODE_ID} --role ${HERMES_MESH_ROLE} --token ${HERMES_MESH_TOKEN} --registry ${HERMES_MESH_REGISTRY}
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/var/lib/hermes-mesh /var/log/hermes-mesh
+
+[Install]
+WantedBy=multi-user.target

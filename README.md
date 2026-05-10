@@ -20,6 +20,8 @@
 <a href="docs/mvp.md">MVP Roadmap</a>
 &nbsp;·&nbsp;
 <a href="docs/shared-memory-and-skills.md">Memory & Skill Exchange</a>
+&nbsp;·&nbsp;
+<a href="docs/daemon-sync.md">Daemon Sync</a>
 
 </div>
 
@@ -65,16 +67,18 @@ This repository currently contains:
 - MVP roadmap
 - MCP tool specification
 - shared memory and skill exchange design
+- daemon-to-daemon memory sync API
 - example node and Hermes configs
 - draft Hermes skills
 - Python package skeleton for the future MCP node
 
-Implementation is intentionally staged. The first implemented slice is local shared-memory proposals:
+Implementation is intentionally staged. The first implemented slices are local shared-memory proposals and a daemon HTTP API for node-to-node sync:
 
 ```bash
 uv run --extra dev hermes-mesh memory propose --file card.json
 uv run --extra dev hermes-mesh memory list --state proposed
 uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
+uv run hermes-mesh-daemon --host 127.0.0.1 --port 8732 --node-id macbook-controller --token dev-token
 ```
 
 The next concrete engineering target is:
@@ -91,8 +95,9 @@ MacBook Hermes can call system_info() on the Ubuntu `mail` node over Tailscale M
 4. [MVP Roadmap](docs/mvp.md)
 5. [MCP Tool Specification](docs/mcp-tools.md)
 6. [Shared Memory and Skill Exchange](docs/shared-memory-and-skills.md)
-7. [Example Ubuntu Node Config](configs/node.example.yaml)
-8. [Draft Skills](skills/)
+7. [Daemon Sync](docs/daemon-sync.md)
+8. [Example Ubuntu Node Config](configs/node.example.yaml)
+9. [Draft Skills](skills/)
 
 ## License
 

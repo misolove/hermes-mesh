@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.lerippi.hermes-mesh-daemon</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/letitbe/Developer/hermes-mesh/.venv/bin/hermes-mesh-daemon</string>
+    <string>--host</string>
+    <string>127.0.0.1</string>
+    <string>--port</string>
+    <string>8732</string>
+    <string>--node-id</string>
+    <string>macbook-controller</string>
+    <string>--role</string>
+    <string>controller</string>
+    <string>--registry</string>
+    <string>/Users/letitbe/.hermes-mesh/registry</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HERMES_MESH_TOKEN</key>
+    <string>replace-with-local-token-or-use-wrapper-env</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/letitbe/Library/Logs/hermes-mesh-daemon.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/letitbe/Library/Logs/hermes-mesh-daemon.err.log</string>
+</dict>
+</plist>

@@ -425,6 +425,8 @@ Implemented:
 - stable `mem_<sha256>` IDs
 - local file-backed memory registry
 - propose/list/approve/reject CLI
+- daemon HTTP API for node-to-node sync
+- `/memory/sync/push` approved_shared fan-out endpoint
 - `decisions.jsonl` audit trail
 ```
 
@@ -434,6 +436,7 @@ Usage:
 uv run --extra dev hermes-mesh memory propose --file card.json
 uv run --extra dev hermes-mesh memory list --state proposed
 uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
+uv run hermes-mesh-daemon --host 127.0.0.1 --port 8732 --node-id macbook-controller --token dev-token
 ```
 
 The next implementation target is:
