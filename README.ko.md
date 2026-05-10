@@ -344,8 +344,9 @@ HERMES_NODE_TOKEN_MAIL="긴랜덤토큰"
 3. `docs/threat-model.md` — 보안 모델
 4. `docs/mvp.md` — 단계별 구현 계획
 5. `docs/mcp-tools.md` — MCP tool specification
-6. `configs/node.example.yaml` — Ubuntu node config 예시
-7. `skills/*/SKILL.md` — Hermes skill 초안
+6. `docs/shared-memory-and-skills.md` — Hermes 간 기억/스킬 공유 설계
+7. `configs/node.example.yaml` — Ubuntu node config 예시
+8. `skills/*/SKILL.md` — Hermes skill 초안
 
 ## 현재 상태
 

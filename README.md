@@ -52,10 +52,11 @@ This repo currently contains the initial architecture, threat model, MVP plan, M
 2. `docs/threat-model.md`
 3. `docs/mvp.md`
 4. `docs/mcp-tools.md`
-5. `configs/node.example.yaml`
-6. `skills/hermes-mesh-control/SKILL.md`
-7. `skills/ubuntu-mail-homepage-admin/SKILL.md`
-8. `skills/remote-hermes-delegation/SKILL.md`
+5. `docs/shared-memory-and-skills.md`
+6. `configs/node.example.yaml`
+7. `skills/hermes-mesh-control/SKILL.md`
+8. `skills/ubuntu-mail-homepage-admin/SKILL.md`
+9. `skills/remote-hermes-delegation/SKILL.md`
 
 ## Non-goals
 
