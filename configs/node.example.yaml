@@ -1,0 +1,86 @@
+node:
+  id: ubuntu-mail
+  name: mail
+  os: linux
+  bind: "100.89.252.12"
+  port: 8732
+  transport: http
+  auth:
+    type: bearer
+    token_env: HERMES_NODE_TOKEN
+
+roles:
+  - webserver
+  - mailserver
+  - deploy-target
+
+paths:
+  allow:
+    - /var/www
+    - /etc/nginx
+    - /etc/postfix
+    - /etc/dovecot
+    - /home/hermes
+    - /opt/hermes-mesh
+  deny:
+    - /etc/shadow
+    - /root
+    - /etc/ssl/private
+    - "**/.ssh/id_*"
+
+commands:
+  allow:
+    - hostname
+    - uptime
+    - df
+    - free
+    - git
+    - npm
+    - pnpm
+    - node
+    - python3
+    - nginx -t
+    - systemctl status nginx
+    - systemctl reload nginx
+    - systemctl status postfix
+    - systemctl reload postfix
+    - systemctl status dovecot
+    - systemctl reload dovecot
+    - journalctl
+    - mailq
+    - postqueue
+    - certbot certificates
+    - certbot renew --dry-run
+  deny_patterns:
+    - "rm -rf /"
+    - mkfs
+    - "dd if="
+    - iptables
+    - "nft "
+    - userdel
+    - passwd
+    - "curl *|*bash"
+    - "wget *|*bash"
+
+services:
+  allow_status:
+    - nginx
+    - postfix
+    - dovecot
+    - fail2ban
+  allow_reload:
+    - nginx
+    - postfix
+    - dovecot
+  require_approval_restart:
+    - nginx
+    - postfix
+    - dovecot
+
+audit:
+  path: /var/log/hermes-node/audit.jsonl
+  redact:
+    - token
+    - password
+    - secret
+    - api_key

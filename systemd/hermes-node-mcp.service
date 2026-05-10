@@ -1,0 +1,21 @@
+[Unit]
+Description=Hermes Mesh MCP Node
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/hermes-mesh
+EnvironmentFile=/etc/hermes-mesh/hermes-node.env
+ExecStart=/opt/hermes-mesh/.venv/bin/python -m hermes_mesh.server --config /etc/hermes-mesh/node.yaml
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+[project]
+name = "hermes-mesh"
+version = "0.1.0"
+description = "Policy-bound MCP nodes for safe Hermes-to-machine and Hermes-to-Hermes control over private networks."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Lerippi"}]
+dependencies = [
+  "mcp>=1.0.0",
+  "pydantic>=2.0.0",
+  "PyYAML>=6.0.0"
+]
+
+[project.scripts]
+hermes-mesh-node = "hermes_mesh.server:main"
+
+[tool.ruff]
+line-length = 100

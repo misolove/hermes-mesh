@@ -1,0 +1,10 @@
+# Add this to MacBook ~/.hermes/config.yaml after the Ubuntu node is running.
+# Store the real token in ~/.hermes/.env, not here.
+
+mcp_servers:
+  ubuntu_mail:
+    url: "http://mail.tailb30d36.ts.net:8732/mcp"
+    headers:
+      Authorization: "Bearer ${HERMES_NODE_TOKEN_MAIL}"
+    timeout: 180
+    connect_timeout: 30
