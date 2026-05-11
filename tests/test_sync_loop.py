@@ -76,3 +76,36 @@ def test_run_sync_once_heartbeats_pushes_and_pulls(tmp_path: Path):
     assert any(call["url"] == "http://ubuntu:8732/health" for call in transport.gets)
     assert any("/memory/sync/pull" in call["url"] for call in transport.gets)
     assert any(call["url"] == "http://ubuntu:8732/memory/sync/push" for call in transport.posts)
+
+
+class FailingPushTransport(FakeTransport):
+    def post_json(self, url, *, token, payload, timeout):
+        self.posts.append({"url": url, "token": token, "payload": payload, "timeout": timeout})
+        if url.endswith("/memory/sync/push"):
+            raise RuntimeError("push down")
+        return self.post_response
+
+
+def test_run_sync_once_reports_peer_errors_and_continues(tmp_path: Path):
+    registry = MemoryRegistry(tmp_path)
+    failing = MemorySyncClient(
+        "http://down:8732",
+        token="peer-token",
+        transport=FailingPushTransport(),
+    )
+    healthy_transport = FakeTransport()
+    healthy = MemorySyncClient(
+        "http://healthy:8732",
+        token="peer-token",
+        transport=healthy_transport,
+    )
+
+    result = run_sync_once(registry, [failing, healthy], from_node="macbook-controller")
+
+    assert result["peers"][0]["peer"] == "http://down:8732"
+    assert result["peers"][0]["ok"] is False
+    assert result["peers"][0]["phase"] == "push_pull"
+    assert "push down" in result["peers"][0]["error"]
+    assert result["peers"][1]["peer"] == "http://healthy:8732"
+    assert result["peers"][1]["heartbeat"]["ok"] is True
+    assert healthy_transport.posts

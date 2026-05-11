@@ -27,6 +27,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    # @lat: [[interfaces#CLI Surface]]
     parser = argparse.ArgumentParser(prog="hermes-mesh")
     parser.add_argument(
         "--registry",

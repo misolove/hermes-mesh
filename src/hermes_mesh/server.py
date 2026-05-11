@@ -61,6 +61,11 @@ def main() -> None:
         """Reject a proposed memory card."""
         return make_client().reject_memory_card(memory_id, actor=actor, reason=reason)
 
+    @mcp.tool()
+    def trigger_sync_once() -> dict[str, Any]:
+        """Trigger one immediate daemon peer memory sync pass."""
+        return make_client().trigger_sync_once()
+
     mcp.run()
 
 

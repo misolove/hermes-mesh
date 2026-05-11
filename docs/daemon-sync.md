@@ -64,6 +64,8 @@ src/hermes_mesh/daemon.py
   - /memory/cards/{id}/approve
   - /memory/cards/{id}/reject
   - /memory/sync/push
+  - /memory/sync/pull
+  - /memory/sync/run-once
 
 src/hermes_mesh/sync.py
   - MemorySyncClient
@@ -103,6 +105,7 @@ POST /memory/cards/{id}/approve
 POST /memory/cards/{id}/reject
 GET  /memory/sync/pull
 POST /memory/sync/push
+POST /memory/sync/run-once
 ```
 
 ## Source preservation rule
@@ -171,7 +174,7 @@ Propose a memory:
 
 ```bash
 curl -sS -X POST http://127.0.0.1:8732/memory/propose \
-  -H 'Authorization: Bearer dev-token' \
+  -H "Authorization: Bearer $HERMES_MESH_TOKEN" \
   -H 'Content-Type: application/json' \
   --data @card.json
 ```
@@ -180,12 +183,21 @@ List pending memories:
 
 ```bash
 curl -sS 'http://127.0.0.1:8732/memory/cards?state=proposed' \
-  -H 'Authorization: Bearer dev-token'
+  -H "Authorization: Bearer $HERMES_MESH_TOKEN"
+```
+
+Trigger one sync pass now:
+
+```bash
+curl -sS -X POST http://127.0.0.1:8732/memory/sync/run-once \
+  -H "Authorization: Bearer $HERMES_MESH_TOKEN"
 ```
 
 ## Current sync behavior
 
 `/memory/sync/push` accepts only `approved_shared` cards.
+
+`/memory/sync/run-once` invokes the same heartbeat + push + pull loop used by periodic sync. It returns peer results, reports bad peers as structured `ok: false` entries, and returns `{"peers": []}` when no peers are configured.
 
 This prevents arbitrary worker nodes from silently installing proposed memories as shared truth.
 

@@ -77,6 +77,13 @@ def test_memory_propose_list_approve_roundtrip(tmp_path):
     assert listed.status_code == 200, listed.text
     assert [item["id"] for item in listed.json()] == [memory_id]
 
+    fetched = client.get(f"/memory/cards/{memory_id}", headers=auth())
+    assert fetched.status_code == 200, fetched.text
+    assert fetched.json()["id"] == memory_id
+
+    invalid = client.get("/memory/cards/../escaped", headers=auth())
+    assert invalid.status_code == 404
+
     approved = client.post(
         f"/memory/cards/{memory_id}/approve",
         headers=auth(),

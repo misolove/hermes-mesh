@@ -24,6 +24,7 @@ class NodeConfig(BaseModel):
 
 
 class ServerConfig(BaseModel):
+    # @lat: [[configuration#Server Config]]
     host: str = "127.0.0.1"
     port: int = 8732
     token: str | None = None
@@ -47,6 +48,7 @@ class SyncConfig(BaseModel):
 
 
 class PeerConfig(BaseModel):
+    # @lat: [[configuration#Peer Config]]
     id: str
     url: str
     token: str | None = None
@@ -71,6 +73,7 @@ class PeerConfig(BaseModel):
 
 
 class DaemonConfig(BaseModel):
+    # @lat: [[configuration#Daemon Config Model]]
     node: NodeConfig
     server: ServerConfig = Field(default_factory=ServerConfig)
     registry: RegistryConfig = Field(default_factory=RegistryConfig)
@@ -79,5 +82,6 @@ class DaemonConfig(BaseModel):
 
 
 def load_daemon_config(path: str | Path) -> DaemonConfig:
+    # @lat: [[configuration#Loading Config]]
     raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     return DaemonConfig.model_validate(raw)

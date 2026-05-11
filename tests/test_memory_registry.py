@@ -72,3 +72,17 @@ def test_registry_filters_by_state(tmp_path):
 
     assert [card.id for card in proposed] == [card2.id]
     assert [card.id for card in approved] == [card1.id]
+
+
+def test_registry_rejects_invalid_memory_id_paths(tmp_path):
+    registry = MemoryRegistry(tmp_path)
+
+    for bad_id in ["../escaped", "foo/bar", "/tmp/mem_bad", "mem_nothex"]:
+        try:
+            registry.get(bad_id, missing_ok=True)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"accepted invalid memory id: {bad_id}")
+
+    assert not (tmp_path / "escaped.json").exists()

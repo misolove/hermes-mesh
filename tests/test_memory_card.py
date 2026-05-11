@@ -73,3 +73,9 @@ def test_low_sensitivity_memory_can_auto_promote_when_policy_allows():
     card = MemoryCard.model_validate(valid_card_data(sensitivity="low"))
 
     assert card.can_auto_promote(auto_promote_low_sensitivity=True)
+
+
+def test_memory_card_rejects_path_like_or_non_stable_ids():
+    for bad_id in ["../escaped", "foo/bar", "/tmp/mem_bad", "mem_nothex"]:
+        with pytest.raises(ValidationError):
+            MemoryCard.model_validate(valid_card_data(id=bad_id))

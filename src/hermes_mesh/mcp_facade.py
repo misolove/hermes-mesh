@@ -8,12 +8,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import urlencode
 
 from hermes_mesh.sync import JsonTransport, UrllibJsonTransport
 
 
 @dataclass(frozen=True)
 class DaemonClient:
+    # @lat: [[interfaces#MCP Facade]]
     base_url: str
     token: str
     timeout: float = 30
@@ -29,7 +31,7 @@ class DaemonClient:
         return self._transport().get_json(f"{self.base_url.rstrip('/')}/node", timeout=self.timeout)
 
     def list_memory_cards(self, *, state: str | None = None) -> list[dict[str, Any]]:
-        suffix = f"?state={state}" if state else ""
+        suffix = f"?{urlencode({'state': state})}" if state else ""
         result = self._transport().get_json(
             f"{self.base_url.rstrip('/')}/memory/cards{suffix}",
             token=self.token,
@@ -69,5 +71,13 @@ class DaemonClient:
             f"{self.base_url.rstrip('/')}/memory/cards/{memory_id}/reject",
             token=self.token,
             payload=payload,
+            timeout=self.timeout,
+        )
+
+    def trigger_sync_once(self) -> dict[str, Any]:
+        return self._transport().post_json(
+            f"{self.base_url.rstrip('/')}/memory/sync/run-once",
+            token=self.token,
+            payload={},
             timeout=self.timeout,
         )

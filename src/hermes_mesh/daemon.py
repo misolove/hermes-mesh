@@ -36,6 +36,8 @@ def create_app(
     peers: list[MemorySyncClient] | None = None,
     sync_interval_seconds: int = 0,
 ) -> Starlette:
+    # @lat: [[architecture#Daemon First Runtime]]
+    # @lat: [[interfaces#Daemon HTTP Surface]]
     registry = MemoryRegistry(registry_root)
     sync_clients = peers or []
 
@@ -81,7 +83,7 @@ def create_app(
             return unauthorized_response()
         try:
             card = registry.get(request.path_params["memory_id"])
-        except KeyError as exc:
+        except (KeyError, ValueError) as exc:
             return JSONResponse({"error": str(exc)}, status_code=404)
         assert card is not None
         return JSONResponse(card.to_json_dict())
@@ -133,6 +135,17 @@ def create_app(
         ]
         return JSONResponse({"from_node": node_id, "cards": cards})
 
+    async def sync_run_once(request: Request) -> JSONResponse:
+        if unauthorized(request, token):
+            return unauthorized_response()
+        result = await asyncio.to_thread(
+            run_sync_once,
+            registry,
+            sync_clients,
+            from_node=node_id,
+        )
+        return JSONResponse(result)
+
     routes = [
         Route("/health", health, methods=["GET"]),
         Route("/node", node, methods=["GET"]),
@@ -144,6 +157,7 @@ def create_app(
         Route("/memory/cards/{memory_id}/reject", reject_memory, methods=["POST"]),
         Route("/memory/sync/push", sync_push, methods=["POST"]),
         Route("/memory/sync/pull", sync_pull, methods=["GET"]),
+        Route("/memory/sync/run-once", sync_run_once, methods=["POST"]),
     ]
     async def periodic_sync() -> None:
         if not sync_clients or sync_interval_seconds <= 0:
@@ -172,6 +186,7 @@ def create_app(
 
 
 def create_app_from_config(config: DaemonConfig) -> Starlette:
+    # @lat: [[configuration#Loading Config]]
     peers = [
         MemorySyncClient(base_url=peer.url, token=peer.token or "")
         for peer in config.peers
@@ -188,6 +203,7 @@ def create_app_from_config(config: DaemonConfig) -> Starlette:
 
 
 def unauthorized(request: Request, token: str | None) -> bool:
+    # @lat: [[architecture#Security Boundary]]
     if not token:
         return False
     return request.headers.get("authorization") != f"Bearer {token}"

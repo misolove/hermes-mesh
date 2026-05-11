@@ -9,11 +9,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+MEMORY_ID_PATTERN = re.compile(r"^mem_[a-f0-9]{16}$")
+
+
+def validate_memory_id(value: str | None) -> str:
+    if not value or not MEMORY_ID_PATTERN.fullmatch(value):
+        raise ValueError("memory_id must match mem_<16 lowercase hex chars>")
+    return value
 
 
 class Confidence(str, Enum):
@@ -31,6 +40,7 @@ class Sensitivity(str, Enum):
 
 
 class PromotionState(str, Enum):
+    # @lat: [[shared-memory#Promotion Policy]]
     LOCAL_ONLY = "local_only"
     PROPOSED = "proposed"
     SHARED_CANDIDATE = "shared_candidate"
@@ -83,6 +93,7 @@ class Promotion(BaseModel):
 
 class MemoryCard(BaseModel):
     """A durable memory proposal that can be shared between Hermes nodes."""
+    # @lat: [[shared-memory#Source Attributed Memory Cards]]
 
     kind: Literal["memory_card"] = "memory_card"
     id: str | None = None
@@ -103,6 +114,13 @@ class MemoryCard(BaseModel):
             raise ValueError("memory card text fields must be non-empty")
         return value
 
+    @field_validator("id")
+    @classmethod
+    def require_safe_memory_id(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return validate_memory_id(value)
+
     @model_validator(mode="after")
     def fill_stable_id_and_enforce_secret_policy(self) -> MemoryCard:
         if self.id is None:
@@ -113,6 +131,7 @@ class MemoryCard(BaseModel):
 
     def can_auto_promote(self, *, auto_promote_low_sensitivity: bool = False) -> bool:
         """Return whether policy may promote this card without asking the user."""
+        # @lat: [[shared-memory#Promotion Policy]]
 
         if self.sensitivity in {Sensitivity.SECRET, Sensitivity.DANGEROUS, Sensitivity.INTERNAL}:
             return False
@@ -126,6 +145,7 @@ class MemoryCard(BaseModel):
 
 def stable_memory_id(card: MemoryCard) -> str:
     """Create a deterministic ID from memory content and provenance."""
+    # @lat: [[shared-memory#Local Registry Contract]]
 
     payload = {
         "kind": card.kind,

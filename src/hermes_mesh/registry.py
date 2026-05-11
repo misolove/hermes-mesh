@@ -7,11 +7,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from hermes_mesh.memory import MemoryCard, PromotionState
+from hermes_mesh.memory import MemoryCard, PromotionState, validate_memory_id
 
 
 class MemoryRegistry:
     """Store memory cards and approval decisions in a local registry directory."""
+    # @lat: [[shared-memory#Local Registry Contract]]
 
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
@@ -114,6 +115,4 @@ class MemoryRegistry:
             f.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
 
     def _card_path(self, memory_id: str | None) -> Path:
-        if not memory_id:
-            raise ValueError("memory_id is required")
-        return self.cards_dir / f"{memory_id}.json"
+        return self.cards_dir / f"{validate_memory_id(memory_id)}.json"

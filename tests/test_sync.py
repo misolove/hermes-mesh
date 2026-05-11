@@ -3,7 +3,7 @@ from pathlib import Path
 
 from hermes_mesh.memory import MemoryCard
 from hermes_mesh.registry import MemoryRegistry
-from hermes_mesh.sync import MemorySyncClient, sync_approved_to_peer
+from hermes_mesh.sync import MemorySyncClient, import_approved_cards, sync_approved_to_peer
 
 
 def valid_card_data(**overrides):
@@ -28,7 +28,12 @@ def valid_card_data(**overrides):
 class FakeTransport:
     def __init__(self):
         self.requests = []
+        self.gets = []
         self.response = {"accepted": [], "skipped": []}
+
+    def get_json(self, url, *, token=None, timeout=30):
+        self.gets.append({"url": url, "token": token, "timeout": timeout})
+        return {"cards": []}
 
     def post_json(self, url, *, token, payload, timeout):
         self.requests.append({"url": url, "token": token, "payload": payload, "timeout": timeout})
@@ -67,3 +72,32 @@ def test_sync_client_normalizes_base_url_and_timeout():
 
     assert transport.requests[0]["url"] == "http://node:8732/memory/sync/push"
     assert transport.requests[0]["timeout"] == 12
+
+
+def test_sync_client_url_encodes_pull_from_node():
+    transport = FakeTransport()
+    client = MemorySyncClient("http://node:8732/", token="t", transport=transport)
+
+    client.pull_cards(from_node="mac book/controller")
+
+    assert transport.gets[0]["url"] == "http://node:8732/memory/sync/pull?from_node=mac+book%2Fcontroller"
+
+
+def test_import_approved_cards_skips_malformed_cards_but_keeps_valid_cards(tmp_path: Path):
+    registry = MemoryRegistry(tmp_path)
+    valid = MemoryCard.model_validate(
+        valid_card_data(
+            title="Remote approved memory",
+            content="Remote approved memory",
+            promotion={"state": "approved_shared", "requires_user_confirmation": True},
+        )
+    ).to_json_dict()
+    malformed = {**valid, "id": "../escaped"}
+
+    result = import_approved_cards(registry, [malformed, valid])
+
+    assert result["accepted"] == [valid["id"]]
+    assert result["skipped"] == []
+    assert result["errors"] and result["errors"][0].startswith("unknown:")
+    assert registry.get(valid["id"]).title == "Remote approved memory"
+    assert not (tmp_path / "escaped.json").exists()

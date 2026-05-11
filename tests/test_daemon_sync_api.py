@@ -55,3 +55,14 @@ def test_sync_pull_returns_approved_shared_cards_only(tmp_path):
     body = response.json()
     assert [card["id"] for card in body["cards"]] == [proposed["id"]]
     assert MemoryCard.model_validate(body["cards"][0]).promotion.state.value == "approved_shared"
+
+
+def test_sync_run_once_requires_auth_and_returns_no_peers(tmp_path):
+    client = TestClient(create_app(registry_root=tmp_path, node_id="macbook", token="secret"))
+
+    assert client.post("/memory/sync/run-once").status_code == 401
+
+    response = client.post("/memory/sync/run-once", headers=auth())
+
+    assert response.status_code == 200, response.text
+    assert response.json() == {"peers": []}

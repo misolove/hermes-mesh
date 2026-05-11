@@ -69,25 +69,29 @@ This repository currently contains:
 - shared memory and skill exchange design
 - daemon-to-daemon memory sync API
 - heartbeat + approved_shared push/pull loop
+- run-once sync trigger through the protected daemon surface
 - config-backed peer definitions
-- MCP facade wrapping the local daemon
+- MCP facade wrapping the local daemon for review/approval/sync control
 - example node and Hermes configs
 - draft Hermes skills
 - Python package skeleton for the future MCP node
 
-Implementation is intentionally staged. The first implemented slices are local shared-memory proposals and a daemon HTTP API for node-to-node sync:
+Implementation is intentionally staged. The current implemented slice is a local daemon + MCP review/sync loop for source-attributed shared memory:
 
 ```bash
 uv run --extra dev hermes-mesh memory propose --file card.json
 uv run --extra dev hermes-mesh memory list --state proposed
 uv run --extra dev hermes-mesh memory approve mem_xxxxx --actor lerippi
 uv run hermes-mesh-daemon --config configs/macbook.example.yaml
+# via MCP facade or daemon client: trigger_sync_once()
 ```
 
 The next concrete engineering target is:
 
 ```text
-MacBook Hermes can call system_info() on the Ubuntu `mail` node over Tailscale MCP.
+MacBook Hermes can review/approve memory locally, trigger a daemon sync through MCP,
+and then smoke the next remote-machine target: system_info() on the Ubuntu `mail`
+node over Tailscale MCP.
 ```
 
 ## Reading order

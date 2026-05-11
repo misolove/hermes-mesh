@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -13,6 +14,7 @@ from hermes_mesh.registry import MemoryRegistry
 
 
 class JsonTransport(Protocol):
+    # @lat: [[sync-protocol#Transport Contract]]
     def get_json(
         self,
         url: str,
@@ -33,6 +35,7 @@ class JsonTransport(Protocol):
 
 class UrllibJsonTransport:
     """Small dependency-free JSON transport for daemon-to-daemon sync."""
+    # @lat: [[sync-protocol#Transport Contract]]
 
     def get_json(
         self,
@@ -79,6 +82,7 @@ class UrllibJsonTransport:
 
 @dataclass(frozen=True)
 class MemorySyncClient:
+    # @lat: [[sync-protocol#Peer Client]]
     base_url: str
     token: str
     timeout: float = 30
@@ -112,8 +116,9 @@ class MemorySyncClient:
 
     def pull_cards(self, *, from_node: str) -> dict[str, Any]:
         transport = self.transport or UrllibJsonTransport()
+        query = urllib.parse.urlencode({"from_node": from_node})
         return transport.get_json(
-            f"{self.base_url.rstrip('/')}/memory/sync/pull?from_node={from_node}",
+            f"{self.base_url.rstrip('/')}/memory/sync/pull?{query}",
             token=self.token,
             timeout=self.timeout,
         )
@@ -133,10 +138,16 @@ def sync_approved_to_peer(
 
 
 def import_approved_cards(registry: MemoryRegistry, raw_cards: list[dict[str, Any]]) -> dict[str, list[str]]:
+    # @lat: [[sync-protocol#Import Rule]]
     accepted: list[str] = []
     skipped: list[str] = []
+    errors: list[str] = []
     for raw_card in raw_cards:
-        card = MemoryCard.model_validate(raw_card)
+        try:
+            card = MemoryCard.model_validate(raw_card)
+        except Exception as exc:  # noqa: BLE001 - one bad remote card must not drop the batch
+            errors.append(f"unknown: {exc}")
+            continue
         if card.promotion.state is not PromotionState.APPROVED_SHARED:
             skipped.append(card.id or "unknown")
             continue
@@ -146,7 +157,10 @@ def import_approved_cards(registry: MemoryRegistry, raw_cards: list[dict[str, An
             accepted.append(card.id or "unknown")
         else:
             skipped.append(card.id or "unknown")
-    return {"accepted": accepted, "skipped": skipped}
+    result = {"accepted": accepted, "skipped": skipped}
+    if errors:
+        result["errors"] = errors
+    return result
 
 
 def run_sync_once(
@@ -155,15 +169,40 @@ def run_sync_once(
     *,
     from_node: str,
 ) -> dict[str, Any]:
+    # @lat: [[sync-protocol#Push Pull Loop]]
     peer_results: list[dict[str, Any]] = []
     for client in clients:
         heartbeat = client.heartbeat(from_node=from_node)
-        push = sync_approved_to_peer(registry, client, from_node=from_node)
-        pulled = client.pull_cards(from_node=from_node)
-        pull_result = import_approved_cards(registry, pulled.get("cards", []))
+        if heartbeat.get("ok") is False:
+            peer_results.append(
+                {
+                    "peer": client.base_url,
+                    "ok": False,
+                    "phase": "heartbeat",
+                    "heartbeat": heartbeat,
+                    "error": heartbeat.get("error", "heartbeat failed"),
+                }
+            )
+            continue
+        try:
+            push = sync_approved_to_peer(registry, client, from_node=from_node)
+            pulled = client.pull_cards(from_node=from_node)
+            pull_result = import_approved_cards(registry, pulled.get("cards", []))
+        except Exception as exc:  # noqa: BLE001 - one bad peer must not stop the sync loop
+            peer_results.append(
+                {
+                    "peer": client.base_url,
+                    "ok": False,
+                    "phase": "push_pull",
+                    "heartbeat": heartbeat,
+                    "error": str(exc),
+                }
+            )
+            continue
         peer_results.append(
             {
                 "peer": client.base_url,
+                "ok": True,
                 "heartbeat": heartbeat,
                 "push": push,
                 "pull": pull_result,
