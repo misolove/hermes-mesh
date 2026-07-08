@@ -134,8 +134,8 @@ MacBook example:
 ```bash
 mkdir -p ~/.hermes-mesh
 cp configs/macbook.example.yaml ~/.hermes-mesh/macbook.yaml
-export HERMES_MESH_TOKEN=local-controller-token
-export HERMES_MESH_TOKEN_UBUNTU_MAIL=peer-token
+export HERMES_MESH_TOKEN="<controller-token>"
+export HERMES_MESH_TOKEN_UBUNTU_MAIL="<peer-token>"
 uv run hermes-mesh-daemon --config ~/.hermes-mesh/macbook.yaml
 ```
 
@@ -159,7 +159,7 @@ uv run hermes-mesh-daemon \
   --port 8732 \
   --node-id macbook-controller \
   --role controller \
-  --token dev-token \
+  --token "$HERMES_MESH_TOKEN" \
   --registry /tmp/hermes-mesh-registry
 ```
 
